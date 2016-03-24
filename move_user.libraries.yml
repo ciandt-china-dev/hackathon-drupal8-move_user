@@ -1,0 +1,4 @@
+move_user:
+  version: VERSION
+  js: 
+    move-user.js: {}

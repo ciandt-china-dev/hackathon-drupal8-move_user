@@ -15,7 +15,8 @@ function move_user_user_cancel_methods_alter(&$methods) {
 
 function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id) {
   if ($form_id == 'user_cancel_form' || $form_id == 'user_multiple_cancel_confirm') {
-    $form['move_user_reassign'] = array(
+    $form['#attached']['library'][] = 'move_user/move_user';
+    $form['reassign_user'] = array(
       '#type' => 'entity_autocomplete',
       '#target_type' => 'user',
       '#title' => t('Reassign content to:'),
@@ -30,20 +31,21 @@ function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$for
 function move_user_user_cancel($edit, $account, $method) {
   $new_account = \Drupal\user\Entity\User::load();
   $new_uid = !empty($new_account->uid) ? $new_account->uid : 0;
+  $new_uid = $edit['reassign_user'];
   switch ($method) {
     case 'move_user_reassign':
 
       module_load_include('inc', 'node', 'node.admin');
-      $nodes = db_select('node', 'n')
-        ->fields('n', array('nid'))
-        ->condition('uid', $account->uid)
-        ->execute()
-        ->fetchCol();
-      node_mass_update($nodes, array('uid' => $new_uid));
 
-      db_update('node_revision')
+      $nodes = \Drupal::entityQuery('node')
+        ->condition('uid', $account->id())
+        ->execute();
+        
+      node_mass_update($nodes, array('uid' => $new_uid), NULL, TRUE);
+
+      db_update('node_field_revision')
         ->fields(array('uid' => $new_uid))
-        ->condition('uid', $account->uid)
+        ->condition('uid', $account->id())
         ->execute();
 
       break;
