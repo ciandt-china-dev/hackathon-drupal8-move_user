@@ -1,7 +1,11 @@
 <?php 
 
+/**
+ * Implement of hook_user_cancel_menthods_alter().
+ */
 function move_user_user_cancel_methods_alter(&$methods) {
   unset($methods['user_cancel_reassign']);
+  // Add a custom move user reassign method.
   $methods['move_user_reassign'] = array(
     'title' => t('Disable the account and make its content belong to another user.'),
     'description' => t('All your content will be removed and assigned to a different user'),
@@ -10,26 +14,21 @@ function move_user_user_cancel_methods_alter(&$methods) {
 }
 
 function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id) {
-  if ($form_id == 'user_cancel_confirm_form' || $form_id == 'user_multiple_cancel_confirm_form') { 
-    // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $form['reassign_user'] = array(
-//       '#type' => 'textfield',
-//       '#title' => t('Reassign content to:'),
-//       '#maxlength' => 60,
-//       '#autocomplete_path' => 'user/autocomplete',
-//       '#weight' => 10,
-//       '#description' => t('Leave blank for %anonymous.',
-//         array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
-//     );
-
+  if ($form_id == 'user_cancel_form' || $form_id == 'user_multiple_cancel_confirm') {
+    $form['move_user_reassign'] = array(
+      '#type' => 'entity_autocomplete',
+      '#target_type' => 'user',
+      '#title' => t('Reassign content to:'),
+      '#maxlength' => 60,
+      '#weight' => 10,
+      '#description' => t('Leave blank for %anonymous.',
+        array('%anonymous' => \Drupal::config('user.settings')->get('anonymous'))),
+    );
   }
 }
 
 function move_user_user_cancel($edit, $account, $method) {
-  $new_account = user_load_by_name($edit['reassign_user']);
+  $new_account = \Drupal\user\Entity\User::load();
   $new_uid = !empty($new_account->uid) ? $new_account->uid : 0;
   switch ($method) {
     case 'move_user_reassign':
