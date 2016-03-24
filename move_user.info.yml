@@ -1,10 +1,6 @@
 name: 'Move user'
 description: 'Cancel user accounts and reassign content to another user'
-core: 8.x
 package: Other
-scripts:
-  - move-user.js
-version: 7.x-1.x-dev
-project: move_user
-datestamp: '1394178807'
+
 type: module
+core: 8.x
