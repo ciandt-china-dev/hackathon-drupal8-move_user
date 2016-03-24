@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @file
+ * Adds a new method for cancelling user accounts.
+ */
 
 /**
  * Implement of hook_user_cancel_menthods_alter().
@@ -13,6 +17,9 @@ function move_user_user_cancel_methods_alter(&$methods) {
   );
 }
 
+/**
+ * Implement of hook_form_alter().
+ */
 function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id) {
   if ($form_id == 'user_cancel_form' || $form_id == 'user_multiple_cancel_confirm') {
     $form['#attached']['library'][] = 'move_user/move_user';
@@ -28,6 +35,9 @@ function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$for
   }
 }
 
+/**
+ * Implement of hook_user_cancel().
+ */
 function move_user_user_cancel($edit, $account, $method) {
   $new_account = \Drupal\user\Entity\User::load();
   $new_uid = !empty($new_account->uid) ? $new_account->uid : 0;
@@ -40,7 +50,6 @@ function move_user_user_cancel($edit, $account, $method) {
       $nodes = \Drupal::entityQuery('node')
         ->condition('uid', $account->id())
         ->execute();
-        
       node_mass_update($nodes, array('uid' => $new_uid), NULL, TRUE);
 
       db_update('node_field_revision')
