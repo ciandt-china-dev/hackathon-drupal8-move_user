@@ -1,11 +1,11 @@
-<?php 
+<?php
 /**
  * @file
  * Adds a new method for cancelling user accounts.
  */
 
 /**
- * Implement of hook_user_cancel_menthods_alter().
+ * Implements hook_user_cancel_menthods_alter().
  */
 function move_user_user_cancel_methods_alter(&$methods) {
   unset($methods['user_cancel_reassign']);
@@ -18,7 +18,7 @@ function move_user_user_cancel_methods_alter(&$methods) {
 }
 
 /**
- * Implement of hook_form_alter().
+ * Implements hook_form_alter().
  */
 function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id) {
   if ($form_id == 'user_cancel_form' || $form_id == 'user_multiple_cancel_confirm') {
@@ -36,7 +36,7 @@ function move_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface &$for
 }
 
 /**
- * Implement of hook_user_cancel().
+ * Implements hook_user_cancel().
  */
 function move_user_user_cancel($edit, $account, $method) {
   $new_uid = $edit['reassign_user'];
